@@ -3,7 +3,7 @@ import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 
-export default function CountrySelect({ onChange: onChangeProp }) {
+function CountrySelect({ onChange: onChangeProp }) {
 	const onChange = (event, value) => {
 		onChangeProp(value?.label || '');
 	};
@@ -44,6 +44,8 @@ export default function CountrySelect({ onChange: onChangeProp }) {
 		/>
 	);
 }
+
+export { CountrySelect as default };
 
 // From https://bitbucket.org/atlassian/atlaskit-mk-2/raw/4ad0e56649c3e6c973e226b7efaeb28cb240ccb0/packages/core/select/src/data/countries.js
 const countries = [

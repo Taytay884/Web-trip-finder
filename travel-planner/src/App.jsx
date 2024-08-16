@@ -1,36 +1,26 @@
-import { Button, Grid, Stack, Typography, useTheme } from '@mui/material';
-import CountrySelect from './CountrySelector.jsx';
-import TravelByRadio from './TripTypeRadio.jsx';
+import TripForm from './TripForm/TripForm.jsx';
+import { Stack } from '@mui/material';
+import TripPlan from './TripPlan/TripPlan.jsx';
 import { useState } from 'react';
 
+const TRIP_PLAN_ELE_ID = 'trip-plan';
+
 function App() {
-	const theme = useTheme();
-	const [country, setCountry] = useState('');
-	const [tripType, setTripType] = useState('');
+	const [tripData, setTripData] = useState(null);
+
+	const onSubmit = (data) => {
+		setTripData(data);
+		window.scrollTo({
+			top: document.getElementById(TRIP_PLAN_ELE_ID).offsetTop,
+			behavior: 'smooth'
+		});
+	};
 
 	return (
-		<Grid
-			sx={{
-				backgroundColor: theme.palette.background.paper,
-				height: '100vh',
-				width: '100vw',
-				display: 'grid',
-				placeItems: 'center'
-			}}
-		>
-			<Stack gap={5}>
-				<Typography textAlign="center" variant="h1">
-					Travel Planner
-				</Typography>
-				<Stack direction="row" gap={4} sx={{ placeItems: 'center' }}>
-					<CountrySelect onChange={setCountry} />
-					<TravelByRadio onChange={setTripType} />
-					<Button variant="contained" disabled={!country || !tripType}>
-						Plan Trip
-					</Button>
-				</Stack>
-			</Stack>
-		</Grid>
+		<Stack sx={{ width: '100%' }}>
+			<TripForm onSubmit={onSubmit} />
+			<TripPlan id={TRIP_PLAN_ELE_ID} tripData={tripData} />
+		</Stack>
 	);
 }
 
