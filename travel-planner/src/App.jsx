@@ -1,13 +1,14 @@
 import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
-import './App.css'
+import {Grid, useTheme} from "@mui/material";
 
 function App() {
+  const theme = useTheme();
   const [count, setCount] = useState(0)
 
   return (
-    <>
+    <Grid sx={{backgroundColor: theme.palette.background.paper}}>
       <div>
         <a href="https://vitejs.dev" target="_blank">
           <img src={viteLogo} className="logo" alt="Vite logo" />
@@ -28,7 +29,7 @@ function App() {
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
       </p>
-    </>
+    </Grid>
   )
 }
 
