@@ -1,36 +1,37 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import {Grid, useTheme} from "@mui/material";
+import { Button, Grid, Stack, Typography, useTheme } from '@mui/material';
+import CountrySelect from './CountrySelector.jsx';
+import TravelByRadio from './TripTypeRadio.jsx';
+import { useState } from 'react';
 
 function App() {
-  const theme = useTheme();
-  const [count, setCount] = useState(0)
+	const theme = useTheme();
+	const [country, setCountry] = useState('');
+	const [tripType, setTripType] = useState('');
 
-  return (
-    <Grid sx={{backgroundColor: theme.palette.background.paper}}>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </Grid>
-  )
+	return (
+		<Grid
+			sx={{
+				backgroundColor: theme.palette.background.paper,
+				height: '100vh',
+				width: '100vw',
+				display: 'grid',
+				placeItems: 'center'
+			}}
+		>
+			<Stack gap={5}>
+				<Typography textAlign="center" variant="h1">
+					Travel Planner
+				</Typography>
+				<Stack direction="row" gap={4} sx={{ placeItems: 'center' }}>
+					<CountrySelect onChange={setCountry} />
+					<TravelByRadio onChange={setTripType} />
+					<Button variant="contained" disabled={!country || !tripType}>
+						Plan Trip
+					</Button>
+				</Stack>
+			</Stack>
+		</Grid>
+	);
 }
 
-export default App
+export default App;
