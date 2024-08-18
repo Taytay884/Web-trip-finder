@@ -12,7 +12,7 @@ export const useApi = (route, options = {}) => {
 		setLoading(true);
 
 		try {
-			const response = await axios(`${API_URL}/${route}`, { ...options, optionsParam });
+			const response = await axios(`${API_URL}/${route}`, { ...options, ...optionsParam });
 			setData(response.data);
 		} catch (error) {
 			setError(error);

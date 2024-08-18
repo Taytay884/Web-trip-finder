@@ -3,6 +3,7 @@ import compression from 'compression';
 import rateLimit from 'express-rate-limit';
 
 import { HttpCode, ONE_HUNDRED, ONE_THOUSAND, SIXTY } from './core/constants';
+import * as logic from './logic';
 
 export interface ServerOptions {
 	port: number;
@@ -46,8 +47,9 @@ export class Server {
 		});
 
 		this.app.get('/trip-plan', (_req: Request, res: Response) => {
+			const generatedImagePath = logic.getGeneratedImage(_req.query as any);
 			return res.status(HttpCode.OK).send({
-				data: { TRIP: 'TRIPPLAN!' }
+				data: generatedImagePath
 			});
 		});
 
