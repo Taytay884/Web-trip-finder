@@ -46,8 +46,9 @@ export class Server {
 			});
 		});
 
-		this.app.get('/trip-plan', (_req: Request, res: Response) => {
+		this.app.get('/trip-plan', async (_req: Request, res: Response) => {
 			const generatedImagePath = logic.getGeneratedImage(_req.query as any);
+			await logic.fetchTripData(_req.query as any);
 			return res.status(HttpCode.OK).send({
 				data: generatedImagePath
 			});

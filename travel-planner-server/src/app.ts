@@ -1,13 +1,13 @@
 import { envs } from './core/config/env';
-import {Server, ServerOptions} from './server';
+import { Server, ServerOptions } from './server';
 
 (() => {
-    main();
+	main();
 })();
 
 function main(): void {
-    const server = new Server({
-        port: envs.PORT
-    } as ServerOptions);
-    void server.start();
+	const server = new Server({
+		port: envs.PORT
+	} as ServerOptions);
+	void server.start();
 }
