@@ -1,31 +1,7 @@
-import { TextDecoder, TextEncoder } from 'node:util';
-import { ReadableStream, TransformStream } from 'node:stream/web';
-
-Object.defineProperties(globalThis, {
-	TextDecoder: { value: TextDecoder },
-	TextEncoder: { value: TextEncoder },
-	ReadableStream: { value: ReadableStream },
-	TransformStream: { value: TransformStream }
-});
-
-import { Blob, File } from 'node:buffer';
-import fetch = require('node-fetch');
-import { Headers, Request, Response } from 'node-fetch';
-
-Object.defineProperties(globalThis, {
-	fetch: { value: fetch, writable: true },
-	Blob: { value: Blob },
-	File: { value: File },
-	Headers: { value: Headers },
-	Request: { value: Request },
-	Response: { value: Response }
-});
 import { envs } from './core/config/env';
 import { TripData } from './types';
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
-// import { ProxyAgent } from 'undici';
-// const dispatcher = new ProxyAgent('http://127.0.0.1:7890');
 
 const genAI = new GoogleGenerativeAI(envs.GOOGLE_API_KEY);
 const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });

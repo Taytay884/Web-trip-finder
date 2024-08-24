@@ -46,7 +46,7 @@ export class Server {
 			});
 		});
 
-		this.app.get('/trip-plan', async (req: Request, res: Response) => {
+		this.app.get('/trip-image', async (req: Request, res: Response) => {
 			try {
 				const generatedImagePath = await logic.getGeneratedImage(req.query as TripData);
 				return res.status(HttpCode.OK).send({
@@ -57,6 +57,13 @@ export class Server {
 					error: 'Failed to generate image'
 				});
 			}
+		});
+
+		this.app.get('/trip-plan', async (_req: Request, res: Response) => {
+			const tripData = await logic.fetchTripData(_req.query as any);
+			return res.status(HttpCode.OK).send({
+				data: tripData
+			});
 		});
 
 		this.app.listen(this.port, () => {
