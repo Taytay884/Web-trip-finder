@@ -71,6 +71,7 @@ export async function fetchTripDataFromGemini({ country, tripType }: TripData) {
     }
 
     Ensure the data is consistent and the route is continuous over 3 days.
+    Please respond only with valid JSON. Do not include any additional text, explanations, or notes.
   `;
 
 	const result = await model.generateContent(prompt);
