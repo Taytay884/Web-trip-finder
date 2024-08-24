@@ -46,7 +46,7 @@ export class Server {
 			});
 		});
 
-		this.app.get('/trip-image', async (req: Request, res: Response) => {
+		this.app.get('/trip-photo', async (req: Request, res: Response) => {
 			try {
 				const generatedImagePath = await logic.getGeneratedImage(req.query as TripData);
 				return res.status(HttpCode.OK).send({

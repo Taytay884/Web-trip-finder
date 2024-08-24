@@ -12,6 +12,7 @@ export async function fetchTripDataFromGemini({ country, tripType }: TripData) {
 	const prompt =
 		'"I am building a web app for planning 3-day trips by car or bike in different countries. I need you to generate a structured JSON object for a 3-day trip in a specific country based on the following criteria:\n' +
 		'\n' +
+		'This trip must be continuous which means each end should be the start of the next day.\n' +
 		'Trip Type: Either by bike or car.\n' +
 		'\n' +
 		'For a bike, each day’s trip can be up to 80 km.\n' +
