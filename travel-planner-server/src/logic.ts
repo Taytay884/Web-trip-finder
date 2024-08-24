@@ -25,7 +25,7 @@ export async function getGeneratedImage(tripData: TripData): Promise<string> {
 		const generateResponse = await axios.post(
 			'https://stablehorde.net/api/v2/generate/async',
 			{
-				prompt: `A scenic view of ${tripData.country} for a ${tripData.tripType} trip.`,
+				prompt: `show ${tripData.country} view`,
 				params: {
 					cfg_scale: 7.5,
 					denoising_strength: 0.75,
