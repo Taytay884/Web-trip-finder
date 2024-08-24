@@ -2,6 +2,7 @@ import { TripData } from './types';
 import { MongoClient } from 'mongodb';
 import axios from 'axios';
 import { envs } from './core/config/env';
+import { fetchTripDataFromGemini } from './gemini';
 
 const client = new MongoClient(envs.MONGODB_URI);
 
@@ -83,4 +84,8 @@ async function saveImageUrlToMongo(imageUrl: string): Promise<void> {
 	} finally {
 		await client.close();
 	}
+}
+
+export async function fetchTripData(tripData: TripData): Promise<any> {
+	return fetchTripDataFromGemini(tripData);
 }
