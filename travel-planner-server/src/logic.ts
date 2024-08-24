@@ -21,6 +21,16 @@ const bucketName = 'travel_planner_img';
 
 export async function getGeneratedImage(tripData: TripData): Promise<string> {
 	try {
+		// Construct the expected Google Cloud Storage URL based on trip data
+		const expectedImageUrl = `https://storage.googleapis.com/${bucketName}/${tripData.country}_with_${tripData.tripType}_image.png`;
+
+		// Check if the image URL already exists in MongoDB
+		const existingImageUrl = await checkImageUrlInMongo(expectedImageUrl);
+		if (existingImageUrl) {
+			console.log('Image already exists in MongoDB:', existingImageUrl);
+			return existingImageUrl;
+		}
+
 		// Request to generate the image
 		const generateResponse = await axios.post(
 			'https://stablehorde.net/api/v2/generate/async',
@@ -56,7 +66,7 @@ export async function getGeneratedImage(tripData: TripData): Promise<string> {
 		const filePath = await downloadImage(tripData, imageUrl);
 
 		// Upload the image to Google Cloud Storage
-		const googleCloudUrl = await uploadImageToGoogleCloud(filePath);
+		const googleCloudUrl = await uploadImageToGoogleCloud(filePath, expectedImageUrl);
 
 		// Save the Google Cloud URL to MongoDB
 		await saveImageUrlToMongo(googleCloudUrl);
@@ -68,6 +78,28 @@ export async function getGeneratedImage(tripData: TripData): Promise<string> {
 	} catch (error) {
 		console.error('Error generating image:', error);
 		throw new Error('Failed to generate image');
+	}
+}
+
+async function checkImageUrlInMongo(expectedImageUrl: string): Promise<string | null> {
+	try {
+		await client.connect();
+		const database = client.db('travel_planner');
+		const imagesCollection = database.collection('images');
+
+		// Check if the exact image URL already exists in MongoDB
+		const existingImage = await imagesCollection.findOne({ url: expectedImageUrl });
+
+		if (existingImage) {
+			return existingImage.url;
+		}
+
+		return null;
+	} catch (error) {
+		console.error('Error checking image URL in MongoDB:', error);
+		throw new Error('Failed to check image URL in database');
+	} finally {
+		await client.close();
 	}
 }
 
@@ -109,7 +141,7 @@ async function downloadImage(tripData: TripData, url: string): Promise<string> {
 	});
 }
 
-async function uploadImageToGoogleCloud(filePath: string): Promise<string> {
+async function uploadImageToGoogleCloud(filePath: string, expectedImageUrl: string): Promise<string> {
 	try {
 		const bucket = storage.bucket(bucketName);
 		const fileName = path.basename(filePath);
@@ -125,7 +157,7 @@ async function uploadImageToGoogleCloud(filePath: string): Promise<string> {
 
 		console.log(`File uploaded to Google Cloud Storage: ${fileName}`);
 
-		return `https://storage.googleapis.com/${bucketName}/${fileName}`;
+		return expectedImageUrl;
 	} catch (error) {
 		console.error('Error uploading image to Google Cloud:', error);
 		throw new Error('Failed to upload image to Google Cloud');
@@ -137,7 +169,13 @@ async function saveImageUrlToMongo(imageUrl: string): Promise<void> {
 		await client.connect();
 		const database = client.db('travel_planner');
 		const imagesCollection = database.collection('images');
-		await imagesCollection.insertOne({ url: imageUrl, createdAt: new Date() });
+
+		// Save the image URL to MongoDB
+		await imagesCollection.insertOne({
+			url: imageUrl,
+			createdAt: new Date()
+		});
+
 		console.log('Image URL saved to MongoDB:', imageUrl);
 	} catch (error) {
 		console.error('Error saving image URL to MongoDB:', error);
