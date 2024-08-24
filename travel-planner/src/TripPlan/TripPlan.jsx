@@ -45,8 +45,7 @@ function TripPlan({ id, tripData }) {
 						/>
 					)}
 
-					{errorPlan && <p>Error: {errorPlan.message}</p>}
-					{dataPlan && <TripPlanMap tripData={dataPlan.data} />}
+					{errorPlan ? <p>Error: {errorPlan.message}</p> : dataPlan ? <TripPlanMap tripData={dataPlan.data} /> : null}
 				</>
 			) : null}
 		</Box>
