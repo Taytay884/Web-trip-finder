@@ -1,9 +1,9 @@
-import express, { type Request, type Response } from 'express';
+import express, { Request, Response } from 'express';
 import compression from 'compression';
 import rateLimit from 'express-rate-limit';
-
 import { HttpCode, ONE_HUNDRED, ONE_THOUSAND, SIXTY } from './core/constants';
 import * as logic from './logic';
+import { TripData } from './types';
 
 export interface ServerOptions {
 	port: number;
@@ -46,12 +46,17 @@ export class Server {
 			});
 		});
 
-		this.app.get('/trip-plan', async (_req: Request, res: Response) => {
-			const generatedImagePath = logic.getGeneratedImage(_req.query as any);
-			await logic.fetchTripData(_req.query as any);
-			return res.status(HttpCode.OK).send({
-				data: generatedImagePath
-			});
+		this.app.get('/trip-plan', async (req: Request, res: Response) => {
+			try {
+				const generatedImagePath = await logic.getGeneratedImage(req.query as TripData);
+				return res.status(HttpCode.OK).send({
+					imageUrl: generatedImagePath
+				});
+			} catch (error) {
+				return res.status(HttpCode.INTERNAL_SERVER_ERROR).send({
+					error: 'Failed to generate image'
+				});
+			}
 		});
 
 		this.app.listen(this.port, () => {
