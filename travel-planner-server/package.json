@@ -31,6 +31,7 @@
 		"typescript-eslint": "^8.1.0"
 	},
 	"dependencies": {
+		"@google-cloud/storage": "^7.12.1",
 		"@google/generative-ai": "https://github.com/wujohns/google-generative-ai.git",
 		"axios": "^1.7.5",
 		"compression": "^1.7.4",
