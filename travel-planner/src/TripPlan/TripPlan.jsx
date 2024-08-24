@@ -19,7 +19,17 @@ function TripPlan({ id, tripData }) {
 	}, [tripData]);
 
 	return (
-		<Box id={id} sx={{ width: '100%', minHeight: '100vh', overflow: 'hidden', position: 'relative' }}>
+		<Box
+			id={id}
+			sx={{
+				display: 'grid',
+				placeItems: 'center',
+				width: '100%',
+				minHeight: '100vh',
+				overflow: 'hidden',
+				padding: '20px'
+			}}
+		>
 			{loading ? (
 				<CircularProgress />
 			) : data ? (
@@ -31,7 +41,7 @@ function TripPlan({ id, tripData }) {
 							component="img"
 							src={photoData?.imageUrl} // Adjust according to the structure of your photoData
 							alt="Trip photo"
-							sx={{ width: 512, height: 512, objectFit: 'cover' }}
+							sx={{ width: 512, height: 512, objectFit: 'cover', marginBlockEnd: '20px' }}
 						/>
 					)}
 

@@ -6,113 +6,90 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 const genAI = new GoogleGenerativeAI(envs.GOOGLE_API_KEY);
 const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
-// Access your API key as an environment variable (see "Set up your API key" above)
-
 export async function fetchTripDataFromGemini({ country, tripType }: TripData) {
-	const prompt =
-		'"I am building a web app for planning 3-day trips by car or bike in different countries. I need you to generate a structured JSON object for a 3-day trip in a specific country based on the following criteria:\n' +
-		'\n' +
-		'This trip must be continuous which means each end should be the start of the next day.\n' +
-		'Trip Type: Either by bike or car.\n' +
-		'\n' +
-		'For a bike, each day’s trip can be up to 80 km.\n' +
-		'For a car, each day’s trip should be between 80 km and 300 km.\n' +
-		'For Each Day of the Trip:\n' +
-		'\n' +
-		'Include the total distance in km for the day.\n' +
-		'Create an array of stops for each day.\n' +
-		'For each stop, include:\n' +
-		'Latitude (lat) and Longitude (lng) of the location.\n' +
-		'A description of the stop.\n' +
-		'Info about the stop (detailed context such as historical significance, activities, or cultural relevance).\n' +
-		'A list of points of interest at that stop, where each point includes:\n' +
-		'Name of the point of interest.\n' +
-		'Latitude (lat) and Longitude (lng).\n' +
-		'Info about the point (historical or cultural details).\n' +
-		'Whether there is a trek at the stop. If there is a trek, include:\n' +
-		'Trek name.\n' +
-		'Latitude (lat) and Longitude (lng) of the trek’s start point.\n' +
-		'A brief info about the trek (length, terrain, difficulty level, and what the trek offers in terms of views or experiences).\n' +
-		'Generate the JSON object for a trip to [COUNTRY] by [TRIP TYPE: car or bike], and ensure that the route is continuous and covers 3 days. The JSON structure should look like this:\n' +
-		'\n' +
-		'json\n' +
-		'Copy code\n' +
-		'{\n' +
-		'  "country": "COUNTRY",\n' +
-		'  "tripType": "car",\n' +
-		'  "days": [\n' +
-		'    {\n' +
-		'      "day": 1,\n' +
-		'      "totalDistanceKm": 75,\n' +
-		'      "stops": [\n' +
-		'        {\n' +
-		'          "lat": 52.5200,\n' +
-		'          "lng": 13.4050,\n' +
-		'          "description": "Start in Berlin",\n' +
-		'          "info": "Detailed description about Berlin...",\n' +
-		'          "pointsOfInterest": [\n' +
-		'            {\n' +
-		'              "name": "Brandenburg Gate",\n' +
-		'              "lat": 52.5163,\n' +
-		'              "lng": 13.3777,\n' +
-		'              "info": "Detailed context about Brandenburg Gate..."\n' +
-		'            },\n' +
-		'            {\n' +
-		'              "name": "Museum Island",\n' +
-		'              "lat": 52.5169,\n' +
-		'              "lng": 13.4019,\n' +
-		'              "info": "Detailed context about Museum Island..."\n' +
-		'            }\n' +
-		'          ],\n' +
-		'          "trek": false\n' +
-		'        },\n' +
-		'        {\n' +
-		'          "lat": 52.3700,\n' +
-		'          "lng": 13.5700,\n' +
-		'          "description": "Stop in Potsdam",\n' +
-		'          "info": "Detailed description about Potsdam...",\n' +
-		'          "pointsOfInterest": [\n' +
-		'            {\n' +
-		'              "name": "Sanssouci Palace",\n' +
-		'              "lat": 52.4044,\n' +
-		'              "lng": 13.0364,\n' +
-		'              "info": "Detailed context about Sanssouci Palace..."\n' +
-		'            }\n' +
-		'          ],\n' +
-		'          "trek": true,\n' +
-		'          "trekInfo": {\n' +
-		'            "name": "Sanssouci Park Trek",\n' +
-		'            "lat": 52.4000,\n' +
-		'            "lng": 13.0370,\n' +
-		'            "info": "Details about the trek..."\n' +
-		'          }\n' +
-		'        }\n' +
-		'      ]\n' +
-		'    },\n' +
-		'    {\n' +
-		'      "day": 2,\n' +
-		'      "totalDistanceKm": 80,\n' +
-		'      "stops": [...]\n' +
-		'    },\n' +
-		'    {\n' +
-		'      "day": 3,\n' +
-		'      "totalDistanceKm": 78,\n' +
-		'      "stops": [...]\n' +
-		'    }\n' +
-		'  ]\n' +
-		'}\n' +
-		'Make sure to provide detailed descriptions for each stop, point of interest, and trek. The trip should be logical and continuous with reasonable travel distances for each day."\n' +
-		'\n' +
-		'country: ' +
-		country +
-		'\n' +
-		'tripType: ' +
-		tripType;
+	const prompt = `
+    I am building a web app for planning 3-day trips by car or bike in different countries.
+    Please generate a structured JSON object for a 3-day trip in ${country} by ${tripType} based on the following criteria:
+
+    - The trip must be continuous, meaning each day's end should be the start of the next day.
+    - Trip Type: Either by bike or car.
+    - For a bike, each day’s trip can be up to 80 km.
+    - For a car, each day’s trip should be between 80 km and 300 km.
+    - For Each Day of the Trip:
+      - Include the total distance in km for the day.
+      - Create an array of stops for each day.
+      - For each stop, include:
+        - Latitude (lat) and Longitude (lng) of the location.
+        - A description of the stop.
+        - Information about the stop (detailed context such as historical significance, activities, or cultural relevance).
+        - A list of points of interest at that stop, where each point includes:
+          - Name of the point of interest.
+          - Latitude (lat) and Longitude (lng).
+          - Information about the point (historical or cultural details).
+        - Whether there is a trek at the stop. If there is a trek, include:
+          - Trek name.
+          - Latitude (lat) and Longitude (lng) of the trek’s start point.
+          - A brief description of the trek (length, terrain, difficulty level, and what the trek offers in terms of views or experiences).
+      
+    Ensure that the JSON object structure strictly follows this format:
+
+    {
+      "country": "${country}",
+      "tripType": "${tripType}",
+      "days": [
+        {
+          "day": 1,
+          "totalDistanceKm": <distance>,
+          "stops": [
+            {
+              "lat": <latitude>,
+              "lng": <longitude>,
+              "description": "<description>",
+              "info": "<info>",
+              "pointsOfInterest": [
+                {
+                  "name": "<name>",
+                  "lat": <latitude>,
+                  "lng": <longitude>,
+                  "info": "<info>"
+                },
+                ...
+              ],
+              "trek": <boolean>,
+              "trekInfo": {
+                "name": "<name>",
+                "lat": <latitude>,
+                "lng": <longitude>,
+                "info": "<info>"
+              }
+            },
+            ...
+          ]
+        },
+        ...
+      ]
+    }
+
+    Ensure the data is consistent and the route is continuous over 3 days.
+  `;
 
 	const result = await model.generateContent(prompt);
 	const response = await result.response;
-	const text = response.text();
-	const parsedText = text.replace('```json', '').replace('```', '').replaceAll('\n', '');
-	const parsedJSON = JSON.parse(parsedText);
-	return parsedJSON;
+	const text = await response.text();
+
+	// Remove code blocks and clean the JSON string
+	const cleanText = text
+		.replace(/```json/g, '')
+		.replace(/```/g, '')
+		.replace(/\n/g, '')
+		.trim();
+
+	// Parse the JSON string
+	try {
+		const parsedJSON = JSON.parse(cleanText);
+		return parsedJSON;
+	} catch (error) {
+		console.error('Failed to parse JSON:', error);
+		throw new Error('Failed to parse the JSON response.');
+	}
 }

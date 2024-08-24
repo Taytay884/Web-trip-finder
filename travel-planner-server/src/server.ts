@@ -60,10 +60,16 @@ export class Server {
 		});
 
 		this.app.get('/trip-plan', async (_req: Request, res: Response) => {
-			const tripData = await logic.fetchTripData(_req.query as any);
-			return res.status(HttpCode.OK).send({
-				data: tripData
-			});
+			try {
+				const tripData = await logic.fetchTripData(_req.query as any);
+				return res.status(HttpCode.OK).send({
+					data: tripData
+				});
+			} catch (e) {
+				return res.status(HttpCode.INTERNAL_SERVER_ERROR).send({
+					error: 'Failed to fetch trip data'
+				});
+			}
 		});
 
 		this.app.listen(this.port, () => {

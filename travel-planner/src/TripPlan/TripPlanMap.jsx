@@ -49,12 +49,14 @@ function TripPlanMap({ tripData }) {
 			}).addTo(mapInstanceRef.current);
 		}
 
+		const lastTripStop =
+			tripData.days[tripData.days.length - 1].stops[tripData.days[tripData.days.length - 1].stops.length - 1];
 		// Add routes and markers
 		tripData.days.forEach((day, index) => {
 			const positions = day.stops.map((stop) => [stop.lat, stop.lng]);
 
 			// Draw the route
-			L.Routing.control({
+			const routingControl = L.Routing.control({
 				waypoints: positions.map((pos) => L.latLng(pos[0], pos[1])),
 				lineOptions: { styles: [{ color: colors[index % colors.length], weight: 4 }] },
 				createMarker: () => null, // Disable default markers
@@ -62,36 +64,51 @@ function TripPlanMap({ tripData }) {
 				showAlternatives: false // Disable alternative routes
 			}).addTo(mapInstanceRef.current);
 
-			// Add markers with labels and popups
-			day.stops.forEach((stop, stopIndex) => {
-				// Determine the label based on stop position
-				let label = '';
-				if (stopIndex === 0) {
-					label = `Day ${day.day} Start`;
-				} else if (stopIndex === day.stops.length - 1) {
-					label = `Day ${day.day} End`;
-				} else {
-					label = stop.description;
-				}
+			// Get the total distance for the day
+			routingControl.on('routesfound', function (e) {
+				const route = e.routes[0];
+				const distanceInKm = (route.summary.totalDistance / 1000).toFixed(2); // Convert meters to kilometers
 
-				const marker = L.marker([stop.lat, stop.lng], { icon: createLabelIcon(label) }).addTo(mapInstanceRef.current);
-				let popupContent = `<strong>${stop.description}</strong><br>${stop.info}<ul>`;
-				stop.pointsOfInterest.forEach((poi) => {
-					popupContent += `<li><strong>${poi.name}:</strong> ${poi.info}</li>`;
-					// Add POI markers
-					L.marker([poi.lat, poi.lng], { icon: poiIcon })
-						.addTo(mapInstanceRef.current)
-						.bindPopup(`<strong>${poi.name}</strong><br>${poi.info}`);
+				// Add markers with labels and popups
+				day.stops.forEach((stop, stopIndex) => {
+					// Determine the label based on stop position
+					let label = '';
+					if (stopIndex === 0) {
+						label = `Day ${day.day} Start`;
+					} else if (stop.lat === lastTripStop.lat && stop.lng === lastTripStop.lng) {
+						label = `Day ${day.day} End`;
+					} else {
+						return;
+					}
+
+					const marker = L.marker([stop.lat, stop.lng], { icon: createLabelIcon(label) }).addTo(mapInstanceRef.current);
+					let popupContent = `<strong>${stop.description}</strong><br>${stop.info}`;
+
+					// Add distance info at the start and end points of each day
+					if (stopIndex === 0) {
+						popupContent += `<br><strong>Distance for Day ${day.day}: ${distanceInKm} km</strong>`;
+					} else if (stopIndex === day.stops.length - 1) {
+						popupContent += `<br><strong>Total Distance for Day ${day.day}: ${distanceInKm} km</strong>`;
+					}
+
+					popupContent += '<ul>';
+					stop.pointsOfInterest.forEach((poi) => {
+						popupContent += `<li><strong>${poi.name}:</strong> ${poi.info}</li>`;
+						// Add POI markers
+						L.marker([poi.lat, poi.lng], { icon: poiIcon })
+							.addTo(mapInstanceRef.current)
+							.bindPopup(`<strong>${poi.name}</strong><br>${poi.info}`);
+					});
+					popupContent += '</ul>';
+					marker.bindPopup(popupContent);
 				});
-				popupContent += '</ul>';
-				marker.bindPopup(popupContent);
 			});
 		});
 	}, [tripData]);
 
 	return (
 		<>
-			<div ref={mapRef} style={{ height: '100vh', width: '100%' }} />
+			<div ref={mapRef} style={{ height: '80vh', width: '80%' }} />
 			<style>
 				{`
                     .custom-label-icon .label-box {
@@ -104,7 +121,7 @@ function TripPlanMap({ tripData }) {
                         font-size: 12px;
                         width: 100px; /* Adjust width as needed */
                     }
-										/* Hide default routing control instructions */
+                    /* Hide default routing control instructions */
                     .leaflet-routing-container {
                         display: none !important;
                     }
